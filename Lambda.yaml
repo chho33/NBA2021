@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: HW3 
+Resources:
+  BasicApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: NBA
+      StageName: dev 
+      Cors: "'*'"
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: ./openapi.yaml
+
+  NBASearch:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: NBASearch
+      Handler: nba_search.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./backend/Lambda
+      Description: 'For search'
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+      - AWSLambdaExecute
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: 'arn:aws:s3:::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - es:*
+            Resource: 'arn:aws:es::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:DescribeKey
+              - kms:ListAliases
+              - lambda:GetPolicy
+              - lambda:ListFunctions
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+              - iam:GetRole
+              - iam:DeleteRole
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetServiceLinkedRoleDeletionStatus
+              - iam:DetachRolePolicy
+              - iam:PassRole
+              - lex:*
+              - dynamodb:*
+              - sqs:*
+              - SNS:*
+            Resource: '*'
+      Events:
+        Search:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BasicApiGateway
+            Path: /search
+            Method: get
+  
+  NBASQS:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: NBASQS
+      Handler: nba_sqs.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./backend/Lambda
+      Description: 'For SQS'
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+      - AWSLambdaExecute
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - es:*
+            Resource: 'arn:aws:es::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:DescribeKey
+              - kms:ListAliases
+              - lambda:GetPolicy
+              - lambda:ListFunctions
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetServiceLinkedRoleDeletionStatus
+              - iam:DetachRolePolicy
+              - iam:PassRole
+              - lex:*
+              - dynamodb:*
+              - sqs:*
+              - SNS:*
+            Resource: '*'
+      Events:
+        NBAQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !ImportValue NBAQueueARN  
+            BatchSize: 10
+
+  LexBot:
+      Type: Custom::LexBot
+      Properties:
+          ServiceToken: !GetAtt LexBotLambda.Arn
+          NamePrefix: NBA 
+          ShouldDelete: true 
+  
+  LexBotLambda:
+      Type: AWS::Serverless::Function
+      Properties:
+          CodeUri: ./backend/Lambda
+          Handler: lex-manager.handler
+          Role: !GetAtt LexBotLambdaRole.Arn
+          Runtime: python3.8
+          Timeout: 300
+          Tracing: Active
+  
+  LexBotLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Principal:
+              Service:
+                - lambda.amazonaws.com
+            Effect: Allow
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: LogsForLambda
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:*"
+        - PolicyName: LexGetLists
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lex:GetBots
+                  - lex:GetBotAliases
+                  - lex:GetIntents
+                  - lex:GetSlotTypes
+                Resource:
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
+        - PolicyName: LexGet
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lex:Get*
+                Resource:
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:${NamePrefix}*:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:${NamePrefix}*:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:${NamePrefix}*:*"
+        - PolicyName: LexMutating
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lex:Put*
+                  - lex:Delete*
+                Resource:
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:${NamePrefix}*:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:${NamePrefix}*:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
+                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:${NamePrefix}*:*"
+        - PolicyName: XRay
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - xray:PutTraceSegments
+                  - xray:PutTelemetryRecords
+                Resource: "*"
+        - PolicyName: AllowVPCSupport
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:CreateNetworkInterface
+                  - ec2:DeleteNetworkInterface
+                Resource: "*"
+
+  NBASearchInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt NBASearch.Arn 
+      Action: 'lambda:InvokeFunction'
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !ImportValue WebsiteBucketARN  
+
+  NBASQAInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt NBASQS.Arn 
+      Action: 'lambda:InvokeFunction'
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !ImportValue WebsiteBucketARN  
