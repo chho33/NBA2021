@@ -1,11 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: NBA 
-Parameters:
-  NamePrefix:
-    Default: NBA
-    Type: String
-
 Resources:
   BasicApiGateway:
     Type: AWS::Serverless::Api
@@ -140,108 +135,6 @@ Resources:
           Properties:
             Queue: !ImportValue NBAQueueArn  
             BatchSize: 10
-
-  LexBot:
-      Type: Custom::LexBot
-      Properties:
-          ServiceToken: !GetAtt LexBotLambda.Arn
-          NamePrefix: !Sub NamePrefix 
-          ShouldDelete: true 
-  
-  LexBotLambda:
-      Type: AWS::Serverless::Function
-      Properties:
-          CodeUri: ./backend/Lambda
-          Handler: lex-manager.handler
-          Role: !GetAtt LexBotLambdaRole.Arn
-          Runtime: python3.8
-          Timeout: 300
-          Tracing: Active
-  
-  LexBotLambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      Path: /
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
-        Statement:
-          - Principal:
-              Service:
-                - lambda.amazonaws.com
-            Effect: Allow
-            Action:
-              - sts:AssumeRole
-      Policies:
-        - PolicyName: LogsForLambda
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                Resource:
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
-                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:*"
-        - PolicyName: LexGetLists
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lex:GetBots
-                  - lex:GetBotAliases
-                  - lex:GetIntents
-                  - lex:GetSlotTypes
-                Resource:
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
-        - PolicyName: LexGet
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lex:Get*
-                Resource:
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:${NamePrefix}*:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:${NamePrefix}*:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:${NamePrefix}*:*"
-        - PolicyName: LexMutating
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lex:Put*
-                  - lex:Delete*
-                Resource:
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:bot:${NamePrefix}*:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:intent:${NamePrefix}*:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:*"
-                  - !Sub "arn:aws:lex:${AWS::Region}:${AWS::AccountId}:slottype:${NamePrefix}*:*"
-        - PolicyName: XRay
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - xray:PutTraceSegments
-                  - xray:PutTelemetryRecords
-                Resource: "*"
-        - PolicyName: AllowVPCSupport
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ec2:DescribeNetworkInterfaces
-                  - ec2:CreateNetworkInterface
-                  - ec2:DeleteNetworkInterface
-                Resource: "*"
 
   NBASearchInvokePermission:
     Type: 'AWS::Lambda::Permission'
