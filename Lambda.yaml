@@ -250,7 +250,7 @@ Resources:
       Action: 'lambda:InvokeFunction'
       Principal: 's3.amazonaws.com'
       SourceAccount: !Sub ${AWS::AccountId}
-      SourceArn: !ImportValue WebsiteBucketARN  
+      SourceArn: !ImportValue WebsiteBucketArn  
 
   NBASQAInvokePermission:
     Type: 'AWS::Lambda::Permission'
@@ -259,4 +259,4 @@ Resources:
       Action: 'lambda:InvokeFunction'
       Principal: 's3.amazonaws.com'
       SourceAccount: !Sub ${AWS::AccountId}
-      SourceArn: !ImportValue WebsiteBucketARN  
+      SourceArn: !ImportValue WebsiteBucketArn  
