@@ -138,7 +138,7 @@ Resources:
         NBAQueueEvent:
           Type: SQS
           Properties:
-            Queue: !ImportValue NBAQueueARN  
+            Queue: !ImportValue NBAQueueArn  
             BatchSize: 10
 
   LexBot:
