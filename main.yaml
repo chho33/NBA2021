@@ -336,6 +336,7 @@ Resources:
               commands:
                 - cd backend/Lambda
                 - python lex-manager.py -i bot-definition.json
+                - cd ../../
                 - aws cloudformation package --template-file $LambdaTemplate --s3-bucket $AssetsBucketName --output-template-file $LambdaOut --debug
           artifacts:
             files: $LambdaOut
