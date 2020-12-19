@@ -1,6 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: HW3 
+Parameters:
+  NamePrefix:
+    Default: NBA
+    Type: String
+
 Resources:
   BasicApiGateway:
     Type: AWS::Serverless::Api
@@ -140,7 +145,7 @@ Resources:
       Type: Custom::LexBot
       Properties:
           ServiceToken: !GetAtt LexBotLambda.Arn
-          NamePrefix: NBA 
+          NamePrefix: !Sub NamePrefix 
           ShouldDelete: true 
   
   LexBotLambda:

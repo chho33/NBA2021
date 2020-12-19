@@ -2,9 +2,14 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: Serverless Frontend CI/CD
 Parameters:
+
+  AssetsBucketName:
+    Type: String
+    Default: "nba.assets"
+
   WebsiteBucketName:
     Type: String
-    Default: "nba"
+    Default: "nba.website"
 
   GitHubRepo:
     Type: String
@@ -112,14 +117,14 @@ Resources:
     Properties: 
       QueueName: "NBAQueue"
 
-  AlarmTopic: 
-    Type: AWS::SNS::Topic
-    Properties: 
-      Subscription: 
-        - 
-          Endpoint: 
-            Ref: "AlarmEmail"
-          Protocol: "email"
+  #AlarmTopic: 
+  #  Type: AWS::SNS::Topic
+  #  Properties: 
+  #    Subscription: 
+  #      - 
+  #        Endpoint: 
+  #          Ref: "AlarmEmail"
+  #        Protocol: "email"
 
   CodeBuildServiceRole:
     Type: AWS::IAM::Role
@@ -224,7 +229,7 @@ Resources:
           version: 0.2
           env:
             variables:
-              WebsiteBucketName: "nba" 
+              WebsiteBucketName: "nba.website" 
           phases:
             build:
               commands:
