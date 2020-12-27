@@ -10,7 +10,11 @@
         $(document).ready(function(){
             $.getJSON("./assets/NBAWordCount.json", function(data){
                 console.log(data);
+<<<<<<< HEAD
                 data = JSON.parse(data);
+=======
+                //data = JSON.parse(data);
+>>>>>>> 041b4781a586657c1558cda3ecef515efb219ac6
                 anychart.onDocumentReady(function() {
                     var chart = anychart.tagCloud(data);
                     chart.title('Hot topics')
@@ -26,4 +30,8 @@
     </script>
   </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 041b4781a586657c1558cda3ecef515efb219ac6
