@@ -10,7 +10,7 @@
         $(document).ready(function(){
             $.getJSON("./assets/NBAWordCount.json", function(data){
                 console.log(data);
-                data = JSON.parse(data);
+                //data = JSON.parse(data);
                 anychart.onDocumentReady(function() {
                     var chart = anychart.tagCloud(data);
                     chart.title('Hot topics')
