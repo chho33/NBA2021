@@ -50,16 +50,21 @@ $(document).ready(function() {
     callChatbotApi(msg)
       .then((response) => {
         console.log(response);
-        var data = response.data;
-
+        var data = JSON.parse(response.data.body);
         if (data.messages && data.messages.length > 0) {
           console.log('received ' + data.messages.length + ' messages');
 
           var messages = data.messages;
-
+		  function replaceAll(string, search, replace) {
+			  return string.split(search).join(replace);
+			}
           for (var message of messages) {
             if (message.type === 'unstructured') {
-              insertResponseMessage(message.unstructured.text);
+			  var txt = message.unstructured.text;
+			  console.log(txt);
+			  replaceAll(txt, "\n", "<br>");
+			  console.log(txt);
+              insertResponseMessage(txt);
             } else if (message.type === 'structured' && message.structured.type === 'product') {
               var html = '';
 
