@@ -1,0 +1,29 @@
+<html lang="en">
+  <head>
+      <script src="assets/js/anychart-base.min.js"></script>
+      <script src="assets/js/anychart-tag-cloud.min.js"></script>
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  </head>
+  <body>
+    <div id="word_cloud" style="height: 100vh"></div>
+    <script>
+        $(document).ready(function(){
+            $.getJSON("./assets/NBAWordCount.json", function(data){
+                console.log(data);
+                data = JSON.parse(data);
+                anychart.onDocumentReady(function() {
+                    var chart = anychart.tagCloud(data);
+                    chart.title('Hot topics')
+                    chart.angles([0])
+                    chart.colorRange().length('80%');
+                    chart.container("word_cloud");
+                    chart.draw();
+                });
+            }).fail(function(){
+                console.log("An error has occurred.");
+            });
+        });
+    </script>
+  </body>
+
+</html>
