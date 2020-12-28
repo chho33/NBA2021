@@ -33,10 +33,12 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 
 ### Live Score
 <img src="https://i.imgur.com/KIoTyAj.gif" width="350">
+
 - Our website provide the up-to-date live score for each game.
 
 ### Odds
-![](https://i.imgur.com/5uVsEbC.png)
+<img src="https://i.imgur.com/5uVsEbC.png" width="350">
+
 - Users who interest in sport lottery can use our service to monitor the odds for in-coming games.
 
 ### Chatbot
@@ -44,18 +46,20 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 - Or search the schedule of games.
 
 ### Game Notify
-![](https://i.imgur.com/aDuhQU3.png)
+<img src="https://i.imgur.com/aDuhQU3.png" width="120">
 
 - Users can get SNS message 5 minutes before a game starts.
 - Or when a game in last 5 minutes.
 
 ### Photos Rekognition
-![](https://i.imgur.com/Xy0Gbgf.png)
+<img src="https://i.imgur.com/Xy0Gbgf.png" width="350">
+
 - Users can upload a player's (unknown) image and get his statistics.
 - Users can upload a screenshot of a game (from Youtube) and get the detailed result of the game.
 
 ### Word Cloud
-![](https://i.imgur.com/BdwBJpd.png)
+<img src="https://i.imgur.com/BdwBJpd.png" width="350">
+
 - Show some popular keywords from Reddit.
 
 
