@@ -22,7 +22,7 @@
     - [Web Crawler](#Web-Crawler)
     - [Chatbot](#Chatbot)
     - [Other AWS Services](#Other-AWS-Services)
-    - [Demo Video](#Demo-Video)
+- [Demo Video](#Demo-Video)
 
 
 ## Overview
@@ -68,7 +68,7 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 ![](https://i.imgur.com/vfFs25x.png)
 
 ### Kafka+EMR
-![](https://i.imgur.com/MUHCWrd.png)
+![](https://i.imgur.com/FZevM8f.png)
 
 
 ### WebSocket Live Score
