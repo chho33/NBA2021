@@ -72,7 +72,7 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 
 
 ### WebSocket Live Score
-![](https://i.imgur.com/NimruGa.png)
+![](https://i.imgur.com/himaHBf.png)
 
 
 ## Tools We Use
