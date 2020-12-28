@@ -1,0 +1,155 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: NBA 
+Resources:
+  BasicApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: NBA
+      StageName: dev 
+      Cors: "'*'"
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: ./openapi.yaml
+
+  NBASearch:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: NBASearch
+      Handler: nba_search.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./backend/Lambda
+      Description: 'For search'
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+      - AWSLambdaExecute
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:PutObject
+            Resource: 'arn:aws:s3:::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - es:*
+            Resource: 'arn:aws:es::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:DescribeKey
+              - kms:ListAliases
+              - lambda:GetPolicy
+              - lambda:ListFunctions
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+              - iam:GetRole
+              - iam:DeleteRole
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetServiceLinkedRoleDeletionStatus
+              - iam:DetachRolePolicy
+              - iam:PassRole
+              - lex:*
+              - dynamodb:*
+              - sqs:*
+              - SNS:*
+            Resource: '*'
+      Events:
+        Search:
+          Type: Api
+          Properties:
+            RestApiId: !Ref BasicApiGateway
+            Path: /search
+            Method: get
+  
+  NBASQS:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: NBASQS
+      Handler: nba_sqs.lambda_handler
+      Runtime: python3.8
+      CodeUri: ./backend/Lambda
+      Description: 'For SQS'
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+      - AWSLambdaExecute
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: 'arn:aws:logs::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - es:*
+            Resource: 'arn:aws:es::::*'
+      - Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - kms:DescribeKey
+              - kms:ListAliases
+              - lambda:GetPolicy
+              - lambda:ListFunctions
+              - lambda:AddPermission
+              - lambda:RemovePermission
+              - cloudwatch:GetMetricStatistics
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:DescribeAlarmsForMetric
+              - iam:CreateServiceLinkedRole
+              - iam:DeleteServiceLinkedRole
+              - iam:GetServiceLinkedRoleDeletionStatus
+              - iam:DetachRolePolicy
+              - iam:PassRole
+              - lex:*
+              - dynamodb:*
+              - sqs:*
+              - SNS:*
+            Resource: '*'
+      Events:
+        NBAQueueEvent:
+          Type: SQS
+          Properties:
+            Queue: !ImportValue NBAQueueArn  
+            BatchSize: 10
+
+  NBASearchInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt NBASearch.Arn 
+      Action: 'lambda:InvokeFunction'
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !ImportValue WebsiteBucketArn  
+
+  NBASQAInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: !GetAtt NBASQS.Arn 
+      Action: 'lambda:InvokeFunction'
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Sub ${AWS::AccountId}
+      SourceArn: !ImportValue WebsiteBucketArn  

@@ -1,0 +1,81 @@
+swagger: '2.0'
+info:
+  title: NBA Upload
+  description: 'NBA Upload API'
+  version: 1.0.0
+schemes:
+  - https
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /upload:
+    post:
+      summary: Upload photos to S3 bucket to trigger lambda.
+      description: |
+        This API helps to upload a photo to S3 bucket, and then return the a json value from lambda.
+      operationId: sendMessage
+      produces:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/UploadRequest'
+      responses:
+        '200':
+          description: Response from lambda
+          schema:
+            $ref: '#/definitions/UploadResponse'
+        '403':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  UploadRequest:
+    type: object
+    properties:
+      bucket:
+        type: string
+      photoname:
+        type: string
+  UploadResponse:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/Statistics'
+  Statistics:
+    type: object
+    properties:
+      hpoints:
+        type: integer
+        format: int32
+      vpoints:
+        type: integer
+        format: int32
+      date:
+        type: string
+      time:
+        type: string
+      home:
+        type: string
+      visitor:
+        type: string
+      attend:
+        type: integer
+        format: int32
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
