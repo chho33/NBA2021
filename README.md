@@ -32,12 +32,12 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 ## Features
 
 ### Live Score
-<img src="https://i.imgur.com/KIoTyAj.gif" width="350">
+<img src="https://i.imgur.com/KIoTyAj.gif" width="450">
 
 - Our website provide the up-to-date live score for each game.
 
 ### Odds
-<img src="https://i.imgur.com/5uVsEbC.png" width="350">
+<img src="https://i.imgur.com/5uVsEbC.png" width="450">
 
 - Users who interest in sport lottery can use our service to monitor the odds for in-coming games.
 
@@ -52,13 +52,13 @@ This is the website for NBA enthusiasts to keep track of up-to-date game informa
 - Or when a game in last 5 minutes.
 
 ### Photos Rekognition
-<img src="https://i.imgur.com/Xy0Gbgf.png" width="350">
+<img src="https://i.imgur.com/Xy0Gbgf.png" width="450">
 
 - Users can upload a player's (unknown) image and get his statistics.
 - Users can upload a screenshot of a game (from Youtube) and get the detailed result of the game.
 
 ### Word Cloud
-<img src="https://i.imgur.com/BdwBJpd.png" width="350">
+<img src="https://i.imgur.com/BdwBJpd.png" width="450">
 
 - Show some popular keywords from Reddit.
 
