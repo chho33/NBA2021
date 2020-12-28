@@ -1,0 +1,24 @@
+
+AWSTemplateFormatVersion: "2010-09-09"
+Resources: 
+  DynamoDBTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - 
+          AttributeName: "team"
+          AttributeType: "S"
+        - 
+          AttributeName: "datetime"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "team"
+          KeyType: "HASH"
+        - 
+          AttributeName: "datetime"
+          KeyType: "RANGE"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      TableName: "NBA"
