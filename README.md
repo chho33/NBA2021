@@ -156,4 +156,4 @@ We use DynamoDB to host different types of data. The following are tables we use
 - IAM for unauthenticated roles under Amazon Cognito Identity pool.
 
 ### Demo Video
-<iframe width="720" height="480" src="https://www.youtube.com/embed/JEi1qssEkVg" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+[Click Me](https://www.youtube.com/embed/JEi1qssEkVg)
